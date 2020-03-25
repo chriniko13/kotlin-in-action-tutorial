@@ -8,9 +8,13 @@ group = "com.chriniko"
 version = "1.0-SNAPSHOT"
 
 dependencies {
+
     compile(kotlin("stdlib-jdk8"))
 
+    compile ("com.google.inject:guice:4.1.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
+
 }
 
 repositories {

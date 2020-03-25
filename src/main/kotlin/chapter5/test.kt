@@ -1,8 +1,10 @@
 package chapter5
 
+import java.lang.StringBuilder
+import java.time.Instant
+import java.util.*
 import kotlin.reflect.KProperty1
 
-//TODO 155/362 (128)
 
 
 fun main() {
@@ -160,9 +162,55 @@ fun main() {
 
 
     // --
-    println()
+    println("\n")
 
-    
+    data class Record(val id: String, var name: String? = null, var createdAt: Instant = Instant.now(), var updatedAt: Instant? = null)
+
+    val record = Record(UUID.randomUUID().toString())
+    println(record)
+
+
+    val updatedRecord = record.apply {
+        name = "john doe"
+        updatedAt = Instant.now()
+    }
+
+    println(record)
+    println(updatedRecord)
+    println(record == updatedRecord)
+    println(record === updatedRecord)
+
+
+    val n: Unit = with (record) {
+        println(name)
+        Unit
+    }
+    println(n)
+
+
+    fun concat(elems: Collection<String>) = with(StringBuilder()) {
+        for ((idx, elem) in elems.withIndex()) {
+            if (idx == elems.size - 1)
+                append(elem)
+            else
+                append("$elem, ")
+        }
+        toString()
+    }
+
+    println(concat(listOf("a", "b", "c", "d")))
+
+    fun concat2(elems: Collection<String>) = StringBuilder().apply {
+        for ((idx, elem) in elems.withIndex()) {
+            if (idx == elems.size - 1)
+                append(elem)
+            else
+                append("$elem, ")
+        }
+    }.toString()
+
+    println(concat2(listOf("a", "b", "c", "d")))
+
 
 } // main.
 
