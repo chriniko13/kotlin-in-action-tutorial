@@ -1,11 +1,12 @@
 package chapter7
 
+import chapter7.EmailService.loadEmails
 import java.lang.IndexOutOfBoundsException
+import java.time.LocalDate
 
 
-//TODO 211/362 (184)
 
-// Conventions == operator overloading.
+// Note: Conventions == operator overloading.
 
 
 fun main() {
@@ -89,6 +90,79 @@ fun main() {
     mPoint[1] = 2000
     println(mPoint)
 
+
+    // ---
+    println()
+
+    val rect = Rectangle(Point(10, 20), Point(50, 50))
+    println(Point(20, 30) in rect)
+    println(Point(5, 5) in rect)
+
+
+    // ---
+    println()
+
+    val now = LocalDate.now()
+    val vacation: ClosedRange<LocalDate> = now..now.plusDays(10)
+
+
+    println(vacation)
+    println(now.plusWeeks(1) in vacation)
+    println(0..10)
+
+    operator fun ClosedRange<LocalDate>.iterator(): Iterator<LocalDate> =
+        object: Iterator<LocalDate> {
+
+            var current = start
+
+            override fun hasNext(): Boolean = current <= endInclusive
+
+            override fun next(): LocalDate = current.apply {
+                current = plusDays(1)
+            }
+
+        }
+
+    for (d in vacation) {
+        println(d)
+    }
+
+
+    // ---
+    println()
+
+    val (x, y) = Point(10, 20)
+    println("($x, $y)")
+
+
+
+    val map = mapOf("1" to "one", "2" to "two")
+    for ((key, value) in map) { // uses extension function for iterator convention, and component1, component2 (destructuring)
+        println("$key -> $value")
+    }
+
+    for (elem in map) {
+        val key = elem.component1() // destructuring.
+        val value = elem.component2()
+        println("$key -> $value")
+
+    }
+
+
+
+    // ---
+    println()
+
+    // Example: lazy initialization (by lazy())
+
+    val p = Person("Alice")
+    p.emails
+    p.emails
+
+    p.emails2
+    p.emails2
+
+
 } // main.
 
 
@@ -146,6 +220,10 @@ class Point(var x: Int, var y: Int): Comparable<Point> {
             else -> throw IndexOutOfBoundsException()
         }
     }
+
+    // Note: destructuring declarations.
+    operator fun component1() = x
+    operator fun component2() = y
 }
 
 operator fun Point.times(p: Point): Point = Point(x * p.x, y * p.y)
@@ -174,3 +252,44 @@ data class MutablePoint(var x: Int, var y: Int) {
 // ---
 
 
+data class Rectangle(val upperLeft: Point, val lowerRight: Point) {
+
+    operator fun contains(other: Point): Boolean {
+        val xRange = upperLeft.x until lowerRight.x
+        val yRange = upperLeft.y until lowerRight.y
+
+        return other.x in xRange && other.y in yRange
+    }
+
+}
+
+// ---
+
+
+object EmailService {
+    fun loadEmails(person: Person): List<Email> {
+        println("Load emails for ${person.name}")
+        return listOf()
+    }
+}
+
+
+class Email {
+    // ...
+}
+
+
+class Person(val name: String) {
+    // ...
+
+    private var _emails: List<Email>? = null
+
+    val emails: List<Email> get() {
+        if (_emails == null) {
+            _emails = loadEmails(this)
+        }
+        return _emails!!
+    }
+
+    val emails2: List<Email> by lazy { loadEmails(this) }
+}
